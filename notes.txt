@@ -10,3 +10,12 @@ venv\Scripts\activate
 4. create a server inside virtual enviroment (using flask)
 py -m pip install flask
 
+
+"Pymongo methods"
+ insert_one
+ find_one_and_update
+ find({})
+ delete_one
+ delete_many
+ update_one
+ update_many

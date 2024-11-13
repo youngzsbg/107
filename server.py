@@ -1,5 +1,6 @@
 from flask import Flask, request
 import json
+from config import db
 
 app = Flask(__name__)
 
@@ -39,18 +40,28 @@ def farewell(name):
 #get
 
 products = []
+
+def fix_id(obj):
+    obj["_id"] = str(obj["_id"])
+    return obj
+
 @app.get("/api/products")
 def get_products():
-    return json.dumps(products)
+    products_db = []
+    cursor = db.products.find({})
+    for prod in cursor:
+        products_db.append(fix_id(prod))
+    return json.dumps(products_db)
 
-#put
+#post
 
 @app.post("/api/products")
 def save_products():
     item = request.get_json()
     print(item)
-    products.append(item)
-    return json.dumps(item)
+    #products.append(item)
+    db.products.insert_one(item)
+    return json.dumps(fix_id(item))
 
 
 #put
@@ -86,5 +97,7 @@ def patch_products(index):
     else:
         return "That index does not exist"
 
+#Final assignment
+#@app.get("/api/catalog")
 
 app.run(debug=True)
