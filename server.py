@@ -1,8 +1,10 @@
-from flask import Flask, request
+from flask import Flask, request, abort
 import json
 from config import db
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.get("/") #this is home page
 def home():    #perform this function if someone tries to get from home page
@@ -96,8 +98,33 @@ def patch_products(index):
         return json.dumps(updated_field)
     else:
         return "That index does not exist"
+#########################################################################
+################# COUPONS#############################
 
-#Final assignment
-#@app.get("/api/catalog")
+@app.post("/api/coupons")
+def save_coupon():
+    item = request.get_json()
+    db.coupons.insert_one(item)
+    return json.dumps(fix_id(item))
+
+@app.get("/api/coupons")
+def get_coupons():
+    coupons = []
+    cursor = db.coupons.find({})
+    for cp in cursor:
+        coupons.append(fix_id(cp))
+    return json.dumps(coupons)
+
+@app.get("api/coupons/<code>")
+def validate_coupon(code):
+    coupon = db.coupons.find_one({"code": code})
+    if coupon == None:
+        print("Error: invalid coupon")
+        return abort(404, "Invalid Code")
+    
+    return json.dumps(fix_id(coupon))
+
+
+
 
 app.run(debug=True)
