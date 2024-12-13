@@ -52,7 +52,8 @@ def get_products():
     products_db = []
     cursor = db.products.find({})
     for prod in cursor:
-        products_db.append(fix_id(prod))
+        if "title" in prod:
+            products_db.append(fix_id(prod))
     return json.dumps(products_db)
 
 #post
@@ -115,7 +116,7 @@ def get_coupons():
         coupons.append(fix_id(cp))
     return json.dumps(coupons)
 
-@app.get("api/coupons/<code>")
+@app.get("/api/coupons/<code>")
 def validate_coupon(code):
     coupon = db.coupons.find_one({"code": code})
     if coupon == None:
